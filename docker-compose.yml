@@ -1,0 +1,55 @@
+version: "3"
+
+networks:
+    quiz_maker:
+        driver: bridge
+
+services:
+    nginx:
+        image: nginx:alpine
+        container_name: nginx
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "8000:80"
+        volumes:
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - .:/var/www/app:delegated
+        depends_on:
+            - php
+        networks:
+            - quiz_maker
+    php:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: php
+        restart: unless-stopped
+        tty: true
+        expose:
+            - "9000"
+        volumes:
+            - .:/var/www/app:delegated
+        networks:
+            - quiz_maker
+    database:
+        image: mariadb:10.11
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_USER: quiz_maker
+            MYSQL_PASSWORD: quiz_maker
+            MYSQL_DATABASE: quiz_maker
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./docker/data:/var/lib/mysql
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        restart: always
+        depends_on:
+            - database
+        environment:
+            PMA_HOST: database
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - "8080:80"
