@@ -30,3 +30,13 @@ RUN composer install
 
 # Set the default command to run php-fpm
 CMD ["php-fpm"]
+
+SHELL ["/bin/bash", "--login", "-c"]
+
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+
+RUN nvm install 20
+RUN nvm use 20
+
+# Cleanup
+RUN rm -rf /usr/src/*

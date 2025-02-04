@@ -43,6 +43,8 @@ services:
             - "3306:3306"
         volumes:
             - ./docker/data:/var/lib/mysql
+        networks:
+            - quiz_maker
     phpmyadmin:
         image: phpmyadmin/phpmyadmin:latest
         restart: always
@@ -53,3 +55,15 @@ services:
             MYSQL_ROOT_PASSWORD: root
         ports:
             - "8080:80"
+        networks:
+            - quiz_maker
+    redis:
+        image: redis:latest
+        healthcheck:
+            test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+            interval: 1s
+            timeout: 3s
+            retries: 5
+        command: [ "redis-server" ]
+        networks:
+            - quiz_maker
