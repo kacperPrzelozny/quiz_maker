@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('shared_quizzes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->rememberToken();
+            $table->unsignedBigInteger('quiz_id')->unique();
+            $table->string('shared_key')->unique();
             $table->timestamps();
+
+            $table->index(['quiz_id']);
+            $table->index(['shared_key']);
+            $table->foreign('quiz_id')->references('id')->on('quizzes');
         });
     }
 
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('shared_quizes');
     }
 };
